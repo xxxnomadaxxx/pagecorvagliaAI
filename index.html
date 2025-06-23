@@ -6,22 +6,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     
-    <!-- Scripts actualizados (usando CDN confiables) -->
+    <!-- Scripts actualizados -->
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
     
     <style>
+        /* === RESET COMPLETO === */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        body {
+        
+        /* === FONDO TRANSPARENTE === */
+        html, body, a-scene {
+            background: transparent !important;
             overflow: hidden;
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-            touch-action: none;
-            background-color: transparent !important; /* Fondo transparente */
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
         }
+        
+        /* === OCULTAR ELEMENTOS NO DESEADOS === */
+        .a-enter-vr, 
+        .a-orientation-modal, 
+        .arjs-loader, 
+        .a-loader-title, 
+        .a-loader-spinner {
+            display: none !important;
+        }
+        
+        /* === PANTALLA DE CARGA === */
         #loading-screen {
             position: fixed;
             top: 0;
@@ -34,10 +51,10 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 1000;
-            text-align: center;
-            padding: 20px;
+            z-index: 10000; /* Mayor que todo */
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
         }
+        
         #start-button {
             margin-top: 20px;
             padding: 12px 24px;
@@ -46,21 +63,9 @@
             border: none;
             border-radius: 24px;
             font-size: 16px;
-            cursor: pointer;
         }
-        /* === CORRECCIÓN PARA ÓVALOS BLANCOS === */
-        .a-enter-vr-button, .arjs-loader {
-            display: none !important;
-        }
-        /* Fondo transparente para la escena AR */
-        .a-scene {
-            background-color: transparent !important;
-        }
-        #error-message {
-            color: #ff453a;
-            margin-top: 15px;
-            max-width: 80%;
-        }
+        
+        /* === MENSAJE FLOTANTE === */
         #info-panel {
             position: fixed;
             bottom: 20px;
@@ -74,35 +79,33 @@
             font-size: 14px;
             max-width: 90%;
             text-align: center;
+            backdrop-filter: blur(5px);
         }
     </style>
 </head>
 <body>
-    <!-- Pantalla de carga inicial -->
+    <!-- Pantalla de carga -->
     <div id="loading-screen">
         <h2>Experiencia AR Corvaglia</h2>
-        <p>Por favor, permite el acceso a la cámara cuando se solicite</p>
-        <button id="start-button">INICIAR AR</button>
-        <div id="error-message"></div>
+        <p>Por favor, permite el acceso a la cámara</p>
+        <button id="start-button">INICIAR EXPERIENCIA</button>
     </div>
 
-    <!-- Escena AR.js - Con fondo transparente -->
+    <!-- Escena AR - Ahora completamente transparente -->
     <a-scene 
         vr-mode-ui="enabled: false"
         embedded 
-        arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix;"
-        renderer="logarithmicDepthBuffer: true; precision: medium; alpha: true;"
+        arjs="sourceType: webcam; debugUIEnabled: false;"
+        renderer="colorManagement: true; alpha: true;"
     >
-        <!-- Marcador Corvaglia -->
         <a-marker 
             type="pattern" 
             url="assets/patterns/corvaglia.patt"
             id="marker-corvaglia"
-            emiteEvents="true"
         >
             <a-video 
-                src="assets/videos/corvaglia.mp4" 
-                width="1.6" 
+                src="assets/videos/corvaglia.mp4"
+                width="1.6"
                 height="0.9"
                 position="0 0.5 0"
                 rotation="-90 0 0"
@@ -114,84 +117,46 @@
                 loop
             ></a-video>
         </a-marker>
-
         <a-entity camera></a-entity>
     </a-scene>
 
-    <!-- Panel de información (ahora centrado) -->
-    <div id="info-panel">Busca el marcador con la cámara</div>
+    <!-- Mensaje de UI -->
+    <div id="info-panel">Mueve el teléfono para encontrar el marcador</div>
 
     <script>
-        // ===== DETECCIÓN DE DISPOSITIVO Y COMPATIBILIDAD =====
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        // ===== ELEMENTOS DEL DOM =====
         const loadingScreen = document.getElementById('loading-screen');
         const startButton = document.getElementById('start-button');
-        const errorMessage = document.getElementById('error-message');
         const infoPanel = document.getElementById('info-panel');
         const arVideo = document.getElementById('ar-video');
 
-        // Verificar compatibilidad
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            showError('Tu navegador no soporta AR. Usa Safari en iPhone o Chrome en Android.');
-        }
-
-        // ===== MANEJADOR DE INICIO =====
+        // ===== INICIAR EXPERIENCIA =====
         startButton.addEventListener('click', () => {
-            initAR();
-        });
-
-        function initAR() {
-            // iOS requiere gesto de usuario para activar la cámara
+            // iOS requiere interacción para activar cámara
             navigator.mediaDevices.getUserMedia({ video: true })
                 .then(() => {
-                    const scene = document.querySelector('a-scene');
-                    
-                    // Forzar modo AR
-                    if (scene.hasLoaded) {
-                        scene.enterVR();
-                    } else {
-                        scene.addEventListener('loaded', () => {
-                            scene.enterVR();
-                        });
-                    }
-
-                    // Ocultar pantalla de carga
                     loadingScreen.style.display = 'none';
-                    infoPanel.textContent = "Mueve el teléfono para encontrar el marcador";
+                    document.querySelector('a-scene').enterVR();
                 })
                 .catch(err => {
-                    showError(`Error: ${err.message || 'Debes permitir acceso a la cámara'}`);
+                    infoPanel.textContent = "Error: " + (err.message || "Debes permitir acceso a la cámara");
+                    infoPanel.style.background = "rgba(255,0,0,0.7)";
                 });
-        }
+        });
 
-        // ===== CONTROL DEL VIDEO =====
+        // ===== CONTROL DE MARCADORES =====
         document.getElementById('marker-corvaglia').addEventListener('markerFound', () => {
             arVideo.setAttribute('visible', true);
-            const videoElement = arVideo.components.material.material.map.image;
-            videoElement.play();
-            infoPanel.textContent = "Reproduciendo video Corvaglia";
+            arVideo.components.material.material.map.image.play();
+            infoPanel.textContent = "Marcador detectado";
+            infoPanel.style.background = "rgba(0,0,0,0.7)";
         });
 
         document.getElementById('marker-corvaglia').addEventListener('markerLost', () => {
             arVideo.setAttribute('visible', false);
-            const videoElement = arVideo.components.material.material.map.image;
-            videoElement.pause();
-            videoElement.currentTime = 0;
-            infoPanel.textContent = "Busca el marcador nuevamente";
+            arVideo.components.material.material.map.image.pause();
+            infoPanel.textContent = "Mueve el teléfono para encontrar el marcador";
         });
-
-        function showError(message) {
-            errorMessage.textContent = message;
-            startButton.style.display = 'none';
-        }
-
-        // === CORRECCIÓN ADICIONAL PARA iOS ===
-        // Asegurar que la escena ocupe toda la pantalla
-        document.querySelector('a-scene').style.position = 'fixed';
-        document.querySelector('a-scene').style.top = '0';
-        document.querySelector('a-scene').style.left = '0';
-        document.querySelector('a-scene').style.width = '100%';
-        document.querySelector('a-scene').style.height = '100%';
     </script>
 </body>
 </html>
