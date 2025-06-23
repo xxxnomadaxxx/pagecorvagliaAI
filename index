@@ -1,196 +1,181 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AR Video Mejorado</title>
-    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <meta charset="utf-8">
+    <title>Experiencia AR Corvaglia</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <!-- Scripts actualizados (usando CDN confiables) -->
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+    
     <style>
-        body { 
-            margin: 0; 
-            overflow: hidden; 
-            font-family: Arial, sans-serif;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .arjs-loader {
-            height: 100%;
-            width: 100%;
-            position: absolute;
+        body {
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            touch-action: none;
+        }
+        #loading-screen {
+            position: fixed;
             top: 0;
             left: 0;
-            background-color: rgba(0, 0, 0, 0.8);
-            z-index: 9999;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            color: #fff;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            flex-direction: column;
-            color: white;
-        }
-        .arjs-loader-spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid #fff;
-            border-top-color: #009688;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        .instructions {
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 15px;
-            border-radius: 5px;
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            right: 20px;
-            z-index: 100;
-            font-size: 14px;
+            z-index: 1000;
             text-align: center;
+            padding: 20px;
         }
-        .marker-status {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(0, 0, 0, 0.7);
+        #start-button {
+            margin-top: 20px;
+            padding: 12px 24px;
+            background: #007AFF;
             color: white;
-            padding: 10px;
-            border-radius: 5px;
-            z-index: 100;
+            border: none;
+            border-radius: 24px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .arjs-loader {
+            display: none; /* Ocultamos el loader por defecto */
+        }
+        #error-message {
+            color: #ff453a;
+            margin-top: 15px;
+            max-width: 80%;
+        }
+        #info-panel {
+            position: fixed;
+            bottom: 20px;
+            left: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 12px;
+            z-index: 500;
             font-size: 14px;
+            max-width: 80%;
         }
     </style>
 </head>
 <body>
-    <div class="arjs-loader">
-        <div class="arjs-loader-spinner"></div>
-        <div>Inicializando realidad aumentada...</div>
+    <!-- Pantalla de carga inicial -->
+    <div id="loading-screen">
+        <h2>Experiencia AR Corvaglia</h2>
+        <p>Por favor, permite el acceso a la cámara cuando se solicite</p>
+        <button id="start-button">INICIAR AR</button>
+        <div id="error-message"></div>
     </div>
 
-    <div class="marker-status" id="marker-status">Marcador no detectado</div>
-
-    <a-scene
-        vr-mode-ui="enabled: false;"
-        renderer="logarithmicDepthBuffer: true;"
-        embedded
-        arjs="sourceType: webcam; 
-              debugUIEnabled: false; 
-              detectionMode: mono; 
-              maxDetectionRate: 30;"
+    <!-- Escena AR.js -->
+    <a-scene 
+        vr-mode-ui="enabled: false"
+        embedded 
+        arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix;"
+        renderer="logarithmicDepthBuffer: true; precision: medium;"
     >
-        <a-assets>
-            <video id="videoTapa" autoplay loop muted crossorigin="anonymous"
-                   src="assets/TAPA_VIDEO.mp4" webkit-playsinline playsinline></video>
-        </a-assets>
-
-        <!-- Marcador con todas las mejoras -->
+        <!-- Marcador Corvaglia -->
         <a-marker 
-            preset="hiro" 
-            emiteEvents="true" 
-            id="hiro-marker"
-            smooth="true"
-            smoothCount="10"
-            smoothTolerance="0.01"
-            smoothThreshold="5"
+            type="pattern" 
+            url="assets/patterns/corvaglia.patt"
+            id="marker-corvaglia"
+            emiteEvents="true"
         >
-            <a-entity 
-                id="video-container"
-                position="0 1.5 0" <!-- Más arriba del marcador -->
-                rotation="0 0 0"
-                scale="1 1 1"
-            >
-                <a-video
-                    id="ar-video"
-                    src="#videoTapa"
-                    width="1.6"
-                    height="0.9"
-                    position="0 0 0"
-                    rotation="-90 0 0"
-                ></a-video>
-            </a-entity>
+            <a-video 
+                src="assets/videos/corvaglia.mp4" 
+                width="1.6" 
+                height="0.9"
+                position="0 0.5 0"
+                rotation="-90 0 0"
+                visible="false"
+                id="ar-video"
+                playsinline
+                webkit-playsinline
+                muted
+                loop
+            ></a-video>
         </a-marker>
 
         <a-entity camera></a-entity>
     </a-scene>
 
-    <div class="instructions">
-        <strong>Instrucciones:</strong><br>
-        1. Abre el <a href="https://raw.githubusercontent.com/AR-js-org/AR.js/master/data/images/hiro.png" target="_blank">marcador Hiro</a> en otra pantalla<br>
-        2. Apunta tu cámara al marcador<br>
-        3. El video continuará reproduciéndose hasta finalizar
-    </div>
+    <!-- Panel de información -->
+    <div id="info-panel">Busca el marcador con la cámara</div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const scene = document.querySelector('a-scene');
-            const loader = document.querySelector('.arjs-loader');
-            const markerStatus = document.getElementById('marker-status');
-            const video = document.querySelector('#videoTapa');
-            const videoContainer = document.querySelector('#video-container');
-            let videoStarted = false;
-            let baseScale = 1;
+        // ===== DETECCIÓN DE DISPOSITIVO Y COMPATIBILIDAD =====
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        const loadingScreen = document.getElementById('loading-screen');
+        const startButton = document.getElementById('start-button');
+        const errorMessage = document.getElementById('error-message');
+        const infoPanel = document.getElementById('info-panel');
+        const arVideo = document.getElementById('ar-video');
 
-            // Ocultar loader
-            scene.addEventListener('loaded', () => {
-                setTimeout(() => {
-                    loader.style.display = 'none';
-                    // Configura el video para que no haga loop
-                    video.loop = false;
-                }, 2000);
-            });
-            
-            // Manejar eventos del marcador
-            const hiroMarker = document.getElementById('hiro-marker');
-            
-            hiroMarker.addEventListener('markerFound', (e) => {
-                markerStatus.textContent = "Marcador detectado!";
-                markerStatus.style.color = "#4CAF50";
-                
-                if(!videoStarted) {
-                    video.play().then(() => {
-                        videoStarted = true;
-                    }).catch(e => {
-                        console.log("Error al reproducir:", e);
-                        markerStatus.textContent += " (Error con video)";
-                    });
-                }
+        // Verificar compatibilidad
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            showError('Tu navegador no soporta AR. Usa Safari en iPhone o Chrome en Android.');
+        }
 
-                // Escalado basado en distancia
-                const markerPosition = e.target.object3D.position;
-                const cameraPosition = document.querySelector('[camera]').object3D.position;
-                const distance = markerPosition.distanceTo(cameraPosition);
-                
-                // Ajuste de escala (crece al alejarse)
-                const newScale = Math.min(Math.max(distance * 0.5, 0.8), 2.5);
-                videoContainer.setAttribute('scale', {
-                    x: newScale,
-                    y: newScale,
-                    z: newScale
-                });
-            });
-            
-            hiroMarker.addEventListener('markerLost', () => {
-                markerStatus.textContent = "Marcador perdido (video continúa)";
-                markerStatus.style.color = "#FF9800";
-                // NO pausamos el video intencionalmente
-            });
-            
-            // Verificar assets
-            video.onerror = () => {
-                markerStatus.textContent = "Error: No se encontró TAPA_VIDEO.mp4";
-                markerStatus.style.color = "#FF5252";
-            };
-
-            // Reproducir hasta el final aunque pierda marcador
-            video.onended = () => {
-                markerStatus.textContent = "Video finalizado";
-                markerStatus.style.color = "#4CAF50";
-                videoStarted = false;
-            };
+        // ===== MANEJADOR DE INICIO =====
+        startButton.addEventListener('click', () => {
+            initAR();
         });
+
+        function initAR() {
+            // iOS requiere gesto de usuario para activar la cámara
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(() => {
+                    const scene = document.querySelector('a-scene');
+                    
+                    // Forzar modo AR
+                    if (scene.hasLoaded) {
+                        scene.enterVR();
+                    } else {
+                        scene.addEventListener('loaded', () => {
+                            scene.enterVR();
+                        });
+                    }
+
+                    // Ocultar pantalla de carga
+                    loadingScreen.style.display = 'none';
+                    infoPanel.textContent = "Mueve el teléfono para encontrar el marcador";
+                })
+                .catch(err => {
+                    showError(`Error: ${err.message || 'Debes permitir acceso a la cámara'}`);
+                });
+        }
+
+        // ===== CONTROL DEL VIDEO =====
+        document.getElementById('marker-corvaglia').addEventListener('markerFound', () => {
+            arVideo.setAttribute('visible', true);
+            const videoElement = arVideo.components.material.material.map.image;
+            videoElement.play();
+            infoPanel.textContent = "Reproduciendo video Corvaglia";
+        });
+
+        document.getElementById('marker-corvaglia').addEventListener('markerLost', () => {
+            arVideo.setAttribute('visible', false);
+            const videoElement = arVideo.components.material.material.map.image;
+            videoElement.pause();
+            videoElement.currentTime = 0;
+            infoPanel.textContent = "Busca el marcador nuevamente";
+        });
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            startButton.style.display = 'none';
+        }
     </script>
 </body>
 </html>
