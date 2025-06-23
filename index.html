@@ -1,95 +1,162 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Corvaglia AI - Soluciones de Inteligencia Artificial</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="script.js" defer></script>
+    <meta charset="utf-8">
+    <title>Experiencia AR Corvaglia</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <!-- Scripts actualizados -->
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+    
+    <style>
+        /* === RESET COMPLETO === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* === FONDO TRANSPARENTE === */
+        html, body, a-scene {
+            background: transparent !important;
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+        
+        /* === OCULTAR ELEMENTOS NO DESEADOS === */
+        .a-enter-vr, 
+        .a-orientation-modal, 
+        .arjs-loader, 
+        .a-loader-title, 
+        .a-loader-spinner {
+            display: none !important;
+        }
+        
+        /* === PANTALLA DE CARGA === */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000; /* Mayor que todo */
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        #start-button {
+            margin-top: 20px;
+            padding: 12px 24px;
+            background: #007AFF;
+            color: white;
+            border: none;
+            border-radius: 24px;
+            font-size: 16px;
+        }
+        
+        /* === MENSAJE FLOTANTE === */
+        #info-panel {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 24px;
+            z-index: 500;
+            font-size: 14px;
+            max-width: 90%;
+            text-align: center;
+            backdrop-filter: blur(5px);
+        }
+    </style>
 </head>
 <body>
+    <!-- Pantalla de carga -->
+    <div id="loading-screen">
+        <h2>Experiencia AR Corvaglia</h2>
+        <p>Por favor, permite el acceso a la cámara</p>
+        <button id="start-button">INICIAR EXPERIENCIA</button>
+    </div>
 
-    <header class="header">
-        <nav class="nav-container">
-            <a href="#" class="nav-logo">
-                <img src="assets/logo.svg" alt="Logo de Corvaglia AI" height="40">
-            </a>
-            <ul class="nav-menu">
-                <li class="nav-menu__item"><a href="#servicios" class="nav-menu__link">Servicios</a></li>
-                <li class="nav-menu__item"><a href="#tecnologias" class="nav-menu__link">Tecnologías</a></li>
-                <li class="nav-menu__item"><a href="#contacto" class="nav-menu__link nav-menu__link--button">Contacto</a></li>
-            </ul>
-            <button class="nav-toggle" aria-label="Abrir menú">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-        </nav>
-    </header>
+    <!-- Escena AR - Ahora completamente transparente -->
+    <a-scene 
+        vr-mode-ui="enabled: false"
+        embedded 
+        arjs="sourceType: webcam; debugUIEnabled: false;"
+        renderer="colorManagement: true; alpha: true;"
+    >
+        <a-marker 
+            type="pattern" 
+            url="assets/patterns/corvaglia.patt"
+            id="marker-corvaglia"
+        >
+            <a-video 
+                src="assets/videos/corvaglia.mp4"
+                width="1.6"
+                height="0.9"
+                position="0 0.5 0"
+                rotation="-90 0 0"
+                visible="false"
+                id="ar-video"
+                playsinline
+                webkit-playsinline
+                muted
+                loop
+            ></a-video>
+        </a-marker>
+        <a-entity camera></a-entity>
+    </a-scene>
 
-    <main>
-        <section class="hero">
-            <div class="hero__content">
-                <h1 class="hero__title">Innovación y Futuro con Inteligencia Artificial</h1>
-                <p class="hero__subtitle">Transformamos tus datos en decisiones inteligentes y automatizamos procesos para llevar tu negocio al siguiente nivel.</p>
-                <a href="#contacto" class="button button--primary">Solicita una Demo</a>
-            </div>
-            <div class="hero__image-container">
-                <img src="assets/hero-image.png" alt="Ilustración de un cerebro digital representando la inteligencia artificial" class="hero__image">
-            </div>
-        </section>
+    <!-- Mensaje de UI -->
+    <div id="info-panel">Mueve el teléfono para encontrar el marcador</div>
 
-        <section id="servicios" class="section">
-            <h2 class="section__title">Nuestros Servicios</h2>
-            <div class="services-grid">
-                <article class="card">
-                    <h3 class="card__title">Análisis Predictivo</h3>
-                    <p class="card__description">Utilizamos algoritmos de machine learning para anticipar tendencias y comportamientos del mercado.</p>
-                </article>
-                <article class="card">
-                    <h3 class="card__title">Procesamiento de Lenguaje Natural (NLP)</h3>
-                    <p class="card__description">Extraemos información valiosa de textos, automatizamos la atención al cliente con chatbots y más.</p>
-                </article>
-                <article class="card">
-                    <h3 class="card__title">Visión por Computadora</h3>
-                    <p class="card__description">Implementamos soluciones para el análisis de imágenes y video, optimizando el control de calidad y la seguridad.</p>
-                </article>
-            </div>
-        </section>
+    <script>
+        // ===== ELEMENTOS DEL DOM =====
+        const loadingScreen = document.getElementById('loading-screen');
+        const startButton = document.getElementById('start-button');
+        const infoPanel = document.getElementById('info-panel');
+        const arVideo = document.getElementById('ar-video');
 
-        <section id="tecnologias" class="section section--dark">
-            <h2 class="section__title">Tecnologías que Dominamos</h2>
-            <div class="tech-logos">
-                <img src="assets/tech-python.svg" alt="Logo de Python" class="tech-logos__item">
-                <img src="assets/tech-tensorflow.svg" alt="Logo de TensorFlow" class="tech-logos__item">
-                <img src="assets/tech-pytorch.svg" alt="Logo de PyTorch" class="tech-logos__item">
-                <img src="assets/tech-aws.svg" alt="Logo de AWS" class="tech-logos__item">
-            </div>
-        </section>
-        
-        <section id="contacto" class="section">
-            <h2 class="section__title">Hablemos de tu Proyecto</h2>
-            <form id="contact-form" class="contact-form">
-                <div class="form-group">
-                    <label for="name">Nombre</label>
-                    <input type="text" id="name" name="name" required>
-                </div>
-                <div class="form-group">
-                    <label for="email">Correo Electrónico</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="message">Mensaje</label>
-                    <textarea id="message" name="message" rows="5" required></textarea>
-                </div>
-                <button type="submit" class="button button--primary">Enviar Mensaje</button>
-            </form>
-        </section>
-    </main>
+        // ===== INICIAR EXPERIENCIA =====
+        startButton.addEventListener('click', () => {
+            // iOS requiere interacción para activar cámara
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(() => {
+                    loadingScreen.style.display = 'none';
+                    document.querySelector('a-scene').enterVR();
+                })
+                .catch(err => {
+                    infoPanel.textContent = "Error: " + (err.message || "Debes permitir acceso a la cámara");
+                    infoPanel.style.background = "rgba(255,0,0,0.7)";
+                });
+        });
 
-    <footer class="footer">
-        <p>&copy; 2025 Corvaglia AI. Todos los derechos reservados.</p>
-    </footer>
+        // ===== CONTROL DE MARCADORES =====
+        document.getElementById('marker-corvaglia').addEventListener('markerFound', () => {
+            arVideo.setAttribute('visible', true);
+            arVideo.components.material.material.map.image.play();
+            infoPanel.textContent = "Marcador detectado";
+            infoPanel.style.background = "rgba(0,0,0,0.7)";
+        });
 
+        document.getElementById('marker-corvaglia').addEventListener('markerLost', () => {
+            arVideo.setAttribute('visible', false);
+            arVideo.components.material.material.map.image.pause();
+            infoPanel.textContent = "Mueve el teléfono para encontrar el marcador";
+        });
+    </script>
 </body>
 </html>
