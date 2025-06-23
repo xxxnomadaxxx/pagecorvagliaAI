@@ -6,35 +6,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     
-    <!-- Librerías A-Frame y AR.js -->
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.0/aframe/build/aframe-ar-nft.min.js"></script>
 
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Pantalla de carga inicial -->
     <div id="loading-screen">
         <h2>Experiencia AR Corvaglia</h2>
         <p>Por favor, permite el acceso a la cámara.</p>
         <button id="start-button">INICIAR EXPERIENCIA</button>
     </div>
 
-    <!-- Escena AR -->
     <a-scene
-        vr-mode-ui="enabled: false"
+        vr-mode-ui="enabled: false;"
         embedded
-        arjs="sourceType: webcam; 
-              debugUIEnabled: false; 
-              detectionMode: mono_and_matrix; 
-              matrixCodeType: 3x3;"
-        renderer="antialias: true; 
-                 colorManagement: true; 
-                 alpha: true; 
-                 logarithmicDepthBuffer: true;"
+        arjs="sourceType: webcam; debugUIEnabled: false;"
+        renderer="antialias: true; colorManagement: true; alpha: true; logarithmicDepthBuffer: true;"
     >
         <a-assets>
-            <!-- Video para el marcador AR -->
             <video
                 id="video-corvaglia"
                 src="assets/videos/video1.mp4"
@@ -43,17 +33,12 @@
                 muted
                 loop
                 crossorigin="anonymous"
-                preload="auto"
             ></video>
         </a-assets>
 
-        <!-- Marcador AR -->
         <a-marker
-            type="pattern"
-            url="assets/patterns/corvaglia.patt"
-            id="marker-corvaglia"
-            emiteEvents="true"
-            cursor="rayOrigin: mouse"
+            type="nft"
+            url="assets/nft/corvaglia" id="marker-corvaglia"
         >
             <a-video
                 src="#video-corvaglia"
@@ -63,16 +48,14 @@
                 rotation="-90 0 0"
                 visible="false"
                 id="ar-video"
-            ></a-video>
+            ></video>
         </a-marker>
 
         <a-entity camera></a-entity>
     </a-scene>
 
-    <!-- Panel de instrucciones -->
-    <div id="info-panel">Apunta la cámara hacia el logo de Corvaglia</div>
+    <div id="info-panel">Apunta la cámara hacia la imagen del marcador</div>
 
-    <!-- Script principal -->
     <script src="script.js"></script>
 </body>
 </html>
