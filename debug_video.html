@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Prueba de Video AR</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.0/aframe/build/aframe-ar-nft.min.js"></script>
+    
+    <script>
+        // Un pequeño componente para manejar la reproducción, es la forma más segura.
+        AFRAME.registerComponent('play-on-find', {
+            init: function () {
+                const marker = this.el.parentElement;
+                const video = this.el.components.material.material.map.image;
+
+                marker.addEventListener('markerFound', () => {
+                    this.el.setAttribute('visible', true);
+                    if (video) video.play();
+                });
+
+                marker.addEventListener('markerLost', () => {
+                    this.el.setAttribute('visible', false);
+                    if (video) video.pause();
+                });
+            }
+        });
+    </script>
+</head>
+
+<body style="margin: 0px; overflow: hidden;">
+    <a-scene
+        vr-mode-ui="enabled: false;"
+        embedded
+        arjs="sourceType: webcam; debugUIEnabled: false;"
+        renderer="logarithmicDepthBuffer: true;"
+    >
+        <a-assets>
+            <video 
+                id="video-asset" 
+                src="/pagecorvagliaAI/assets/videos/video1.mp4" 
+                playsinline 
+                webkit-playsinline 
+                muted 
+                loop 
+                crossorigin="anonymous"
+            ></video>
+        </a-assets>
+
+        <a-marker
+            type="nft"
+            url="/pagecorvagliaAI/assets/nft/corvaglia"
+        >
+            <a-video
+                src="#video-asset"
+                width="1.6"
+                height="0.9"
+                position="0 0.5 0"
+                rotation="-90 0 0"
+                visible="false"
+                play-on-find
+            ></a-video>
+        </a-marker>
+
+        <a-entity camera></a-entity>
+    </a-scene>
+</body>
+</html>
