@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="utf-8">
-    <title>Experiencia AR Corvaglia</title>
+    <title>Experiencia AR Corvaglia - Versión Final</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     
@@ -11,8 +11,7 @@
         .a-enter-vr-button, .a-enter-ar-button { display: none !important; }
     </style>
 
-    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.0/aframe/build/aframe-ar-nft.min.js"></script>
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script> <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.0/aframe/build/aframe-ar-nft.min.js"></script>
     
     <script>
         // COMPONENTE #1: GESTOR DE LA INTERFAZ DE USUARIO (UI)
@@ -25,13 +24,10 @@
                 startButton.addEventListener('click', () => {
                     navigator.mediaDevices.getUserMedia({ video: true })
                         .then(() => {
-                            // --- ¡CAMBIO CLAVE AQUÍ! ---
-                            // En lugar de ocultar la pantalla de carga, la eliminamos por completo.
+                            // La solución definitiva: eliminar el nodo del DOM.
                             if (loadingScreen && loadingScreen.parentNode) {
                                 loadingScreen.parentNode.removeChild(loadingScreen);
                             }
-                            
-                            // Mostramos el panel de información
                             if (infoPanel) {
                                 infoPanel.setAttribute('visible', 'true');
                             }
@@ -50,7 +46,6 @@
         AFRAME.registerComponent('video-handler', {
             init: function () {
                 this.el.setAttribute('visible', false);
-                
                 const marker = this.el.parentElement;
                 const videoAsset = document.querySelector('#video-asset');
                 const infoPanel = document.querySelector('#info-panel');
@@ -76,7 +71,8 @@
         ui-manager
         vr-mode-ui="enabled: false;"
         embedded
-        arjs="sourceType: webcam; debugUIEnabled: false;" renderer="antialias: true; colorManagement: true; alpha: true; logarithmicDepthBuffer: true;"
+        arjs="sourceType: webcam; debugUIEnabled: false;"
+        renderer="antialias: true; colorManagement: true; alpha: true; logarithmicDepthBuffer: true;"
     >
         <a-assets>
             <video id="video-asset" src="/pagecorvagliaAI/assets/video/video1.mp4" playsinline webkit-playsinline muted loop crossorigin="anonymous"></video>
@@ -88,13 +84,12 @@
 
         <a-entity camera>
             <a-entity id="loading-screen" position="0 0 -1">
-                <a-plane color="#121212" height="2.5" width="2.5" position="0 0 -0.01"></a-plane>
+                <a-plane color="#121212" height="3" width="3" position="0 0 -0.01"></a-plane>
                 <a-text id="loading-text" value="Experiencia AR Corvaglia" color="white" position="0 0.2 0" align="center" width="1.8"></a-text>
                 <a-plane id="start-button" color="#007AFF" height="0.2" width="0.8" position="0 -0.3 0" class="clickable">
                     <a-text value="INICIAR" color="white" align="center" width="1.5"></a-text>
                 </a-plane>
             </a-entity>
-
             <a-entity id="info-panel" position="0 -0.8 -1" visible="false">
                 <a-plane color="black" opacity="0.7" height="0.15" width="1.5" radius="0.075"></a-plane>
                 <a-text value="Busca la imagen del marcador" color="white" align="center" width="1.4"></a-text>
