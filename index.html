@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>Experiencia AR Corvaglia</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        .a-enter-vr-button, .a-enter-ar-button {
+            display: none !important;
+        }
+    </style>
+
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.0/aframe/build/aframe-ar-nft.min.js"></script>
+    
+    <script>
+        // COMPONENTE #1: Gestor de la Interfaz de Usuario (UI)
+        // Se encarga de la pantalla de carga y el permiso de la cámara.
+        AFRAME.registerComponent('ui-manager', {
+            init: function () {
+                const sceneEl = this.el; // La escena <a-scene>
+                const loadingScreen = document.querySelector('#loading-screen');
+                const startButton = document.querySelector('#start-button');
+                const infoPanel = document.querySelector('#info-panel');
+
+                startButton.addEventListener('click', () => {
+                    navigator.mediaDevices.getUserMedia({ video: true })
+                        .then(() => {
+                            loadingScreen.setAttribute('visible', 'false');
+                            infoPanel.setAttribute('visible', 'true');
+                            sceneEl.emit('start-experience');
+                        })
+                        .catch(error => {
+                            const errorText = document.querySelector('#loading-text');
+                            if (errorText) {
+                                errorText.setAttribute('value', 'Se necesita acceso a la camara.');
+                            }
+                        });
+                });
+            }
+        });
+
+        // COMPONENTE #2: Gestor del Video sobre el Marcador
+        // Se encarga de mostrar/ocultar y reproducir/pausar el video.
+        AFRAME.registerComponent('video-handler', {
+            init: function () {
+                this.el.setAttribute('visible', false); // Ocultamos el video al inicio
+                
+                const marker = this.el.parentElement;
+                const videoAsset = document.querySelector('#video-asset');
+                const infoPanel = document.querySelector('#info-panel');
+
+                marker.addEventListener('markerFound', () => {
+                    this.el.setAttribute('visible', true);
+                    if (videoAsset) videoAsset.play();
+                    if (infoPanel) infoPanel.setAttribute('text', { value: '¡Marcador detectado!' });
+                });
+
+                marker.addEventListener('markerLost', () => {
+                    this.el.setAttribute('visible', false);
+                    if (videoAsset) videoAsset.pause();
+                    if (infoPanel) infoPanel.setAttribute('text', { value: 'Busca la imagen del marcador' });
+                });
+            }
+        });
+    </script>
+</head>
+
+<body>
+    <a-scene
+        ui-manager
+        vr-mode-ui="enabled: false;"
+        embedded
+        arjs="sourceType: webcam; debugUIEnabled: false;"
+        renderer="antialias: true; colorManagement: true; alpha: true; logarithmicDepthBuffer: true;"
+    >
+        <a-assets>
+            <video id="video-asset" src="/pagecorvagliaAI/assets/video/video1.mp4" playsinline webkit-playsinline muted loop crossorigin="anonymous"></video>
+        </a-assets>
+
+        <a-marker type="nft" url="/pagecorvagliaAI/assets/nft/corvaglia">
+            <a-video src="#video-asset" width="1.6" height="0.9" position="0 0.5 0" rotation="-90 0 0" video-handler></a-video>
+        </a-marker>
+
+        <a-entity camera>
+            <a-entity id="loading-screen" position="0 0 -1">
+                <a-plane color="#121212" height="2" width="2" position="0 0 -0.01"></a-plane>
+                <a-text id="loading-text" value="Experiencia AR Corvaglia" color="white" position="0 0.2 0" align="center" width="1.8"></a-text>
+                <a-text value="Por favor, permite el acceso a la camara" color="white" position="0 0.05 0" align="center" width="1.5" wrap-count="30"></a-text>
+                <a-plane id="start-button" color="#007AFF" height="0.2" width="0.8" position="0 -0.3 0" class="clickable">
+                    <a-text value="INICIAR EXPERIENCIA" color="white" align="center" width="1.5"></a-text>
+                </a-plane>
+            </a-entity>
+
+            <a-entity id="info-panel" position="0 -0.8 -1" visible="false">
+                <a-plane color="black" opacity="0.7" height="0.15" width="1.5" radius="0.075"></a-plane>
+                <a-text value="Busca la imagen del marcador" color="white" align="center" width="1.4"></a-text>
+            </a-entity>
+        </a-entity>
+    </a-scene>
+</body>
+</html>
